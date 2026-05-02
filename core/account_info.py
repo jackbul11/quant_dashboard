@@ -16,8 +16,8 @@ import requests
 #  配置区（建议从环境变量或配置文件读取）
 # ─────────────────────────────────────────────
 class BinanceConfig:
-    API_KEY: str = "SUaC72q0dNwHQMsxsNy1kHYhiJsHVj6abxnQjqT65f17RrW4nPPQBJEl5E5jIvli"        # 替换为你的 API Key
-    SECRET_KEY: str = "MwOsFq6mwGOkY3021SQQtDKjAgH2uMhzCMXA9STww9J59OHCHgA9AAMb70Gnw2V2"     # 替换为你的 Secret Key
+    API_KEY: str = ""        # 替换为你的 API Key
+    SECRET_KEY: str = ""     # 替换为你的 Secret Key
     RECV_WINDOW: int = 5000  # 请求有效窗口(ms)，最大 60000
 
     # 接口基础地址
