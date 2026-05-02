@@ -27,8 +27,8 @@ import requests
 #  配置区  ── 与 account_info.py 保持一致
 # ════════════════════════════════════════════════
 class BinanceConfig:
-    API_KEY:    str  = os.getenv("BINANCE_API_KEY",    "SUaC72q0dNwHQMsxsNy1kHYhiJsHVj6abxnQjqT65f17RrW4nPPQBJEl5E5jIvli")   # 建议用环境变量
-    SECRET_KEY: str  = os.getenv("BINANCE_SECRET_KEY", "MwOsFq6mwGOkY3021SQQtDKjAgH2uMhzCMXA9STww9J59OHCHgA9AAMb70Gnw2V2")
+    API_KEY:    str  = os.getenv("BINANCE_API_KEY",    "")   # 建议用环境变量
+    SECRET_KEY: str  = os.getenv("BINANCE_SECRET_KEY", "")
     RECV_WINDOW: int = 5000
 
     PAPI_BASE = "https://papi.binance.com"   # 统一账户
