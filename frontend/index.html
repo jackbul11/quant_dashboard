@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nexus Quant | 智能回测终端</title>
+    
+    <!-- 引入字体 -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    
+    <!-- 引入图标 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- 引入 ECharts -->
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
+
+    <!-- 样式 -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- 侧边栏 -->
+        <aside class="sidebar">
+            <div class="brand">
+                <div class="logo">
+                    <i class="fa-solid fa-cube"></i>
+                </div>
+                <h2>Nexus<span>Quant</span></h2>
+            </div>
+            
+            <nav class="nav-menu">
+                <a href="#config" class="nav-item active" data-tab="config">
+                    <i class="fa-solid fa-sliders"></i>
+                    <span>策略配置</span>
+                </a>
+                <a href="#logs" class="nav-item" data-tab="logs">
+                    <i class="fa-solid fa-terminal"></i>
+                    <span>运行日志</span>
+                </a>
+                <a href="#results" class="nav-item" data-tab="results">
+                    <i class="fa-solid fa-chart-pie"></i>
+                    <span>回测报告</span>
+                </a>
+                <a href="#account" class="nav-item" data-tab="account">
+                    <i class="fa-solid fa-wallet"></i>
+                    <span>API与账户</span>
+                </a>
+                <a href="#live" class="nav-item" data-tab="live">
+                    <i class="fa-solid fa-robot"></i>
+                    <span>实盘引擎</span>
+                </a>
+            </nav>
+
+            <div class="presets-section">
+                <h3>预设参数</h3>
+                <div class="preset-list">
+                    <button class="preset-btn active"><i class="fa-brands fa-ethereum"></i> ETH 稳健趋势</button>
+                    <button class="preset-btn"><i class="fa-brands fa-bitcoin"></i> BTC 高频</button>
+                    <button class="preset-btn"><i class="fa-solid fa-bolt"></i> 激进破位</button>
+                    <button class="preset-btn add-preset"><i class="fa-solid fa-plus"></i> 保存当前配置</button>
+                </div>
+            </div>
+        </aside>
+
+        <!-- 主内容区 -->
+        <main class="main-content">
+            <!-- 顶栏 -->
+            <header class="topbar">
+                <div class="page-title">
+                    <h1 id="current-tab-title">策略参数配置</h1>
+                    <p id="current-tab-desc">调整 v4.0 用户策略模型核心参数</p>
+                </div>
+                <div class="actions">
+                    <button class="btn btn-secondary"><i class="fa-solid fa-rotate-right"></i> 重置</button>
+                    <button class="btn btn-primary" id="btn-run-backtest">
+                        <i class="fa-solid fa-play"></i> 开始回测
+                    </button>
+                </div>
+            </header>
+
+            <!-- 容器: 策略配置 -->
+            <div class="tab-pane active" id="pane-config">
+                <form id="config-form" class="config-grid">
+                    
+                    <!-- 基础设置 -->
+                    <div class="card config-card">
+                        <div class="card-header">
+                            <i class="fa-solid fa-gear"></i>
+                            <h3>基础设置</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="form-group">
+                                <label>交易对 (Symbol)</label>
+                                <select name="symbols" class="form-control">
+                                    <option value="ETH/USDT" selected>ETH/USDT</option>
+                                    <option value="BTC/USDT">BTC/USDT</option>
+                                    <option value="SOL/USDT">SOL/USDT</option>
+                                </select>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group half">
+                                    <label>开始日期</label>
+                                    <input type="date" name="start_date" value="2022-01-01" class="form-control">
+                                </div>
+                                <div class="form-group half">
+                                    <label>结束日期</label>
+                                    <input type="date" name="end_date" value="2025-12-31" class="form-control">
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group half">
+                                    <label>初始资金 (USDT)</label>
+                                    <input type="number" name="initial_capital" value="10000" class="form-control">
+                                </div>
+                                <div class="form-group half">
+                                    <label>杠杆倍数</label>
+                                    <input type="number" name="leverage" value="3" class="form-control">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>代理端口</label>
+                                <input type="number" name="proxy_port" value="7897" class="form-control">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 核心策略参数 -->
+                    <div class="card config-card">
+                        <div class="card-header">
+                            <i class="fa-solid fa-brain"></i>
+                            <h3>核心策略参数</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="form-row">
+                                <div class="form-group half">
+                                    <label>日线 MA Fast</label>
+                                    <input type="number" name="daily_ma_fast" value="5" class="form-control">
+                                </div>
+                                <div class="form-group half">
+                                    <label>日线 MA Slow</label>
+                                    <input type="number" name="daily_ma_slow" value="20" class="form-control">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>距1H支阻最大距离 (Max Entry Dist)</label>
+                                <div class="input-with-suffix">
+                                    <input type="number" step="0.01" name="max_entry_dist" value="0.02" class="form-control">
+                                    <span class="suffix"></span>
+                                </div>
+                                <div class="help-text">默认 2% (0.02)</div>
+                            </div>
+                            <div class="form-group">
+                                <label>止损缓冲百分比 (SL Buffer Pct)</label>
+                                <div class="input-with-suffix">
+                                    <input type="number" step="0.001" name="sl_buffer_pct" value="0.001" class="form-control">
+                                </div>
+                                <div class="help-text">默认 0.1% (0.001)</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 支撑/压力识别 -->
+                    <div class="card config-card">
+                        <div class="card-header">
+                            <i class="fa-solid fa-layer-group"></i>
+                            <h3>支撑/压力识别</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="form-row">
+                                <div class="form-group half">
+                                    <label>摆动窗口 (K线数)</label>
+                                    <input type="number" name="sr_swing_window" value="8" class="form-control">
+                                </div>
+                                <div class="form-group half">
+                                    <label>最低盈亏比</label>
+                                    <input type="number" step="0.1" name="min_rr" value="1.5" class="form-control">
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group half">
+                                    <label>4H 参考历史数</label>
+                                    <input type="number" name="sr_lookback_4h" value="60" class="form-control">
+                                </div>
+                                <div class="form-group half">
+                                    <label>1H 参考历史数</label>
+                                    <input type="number" name="sr_lookback_1h" value="80" class="form-control">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>聚类合并阈值 (Cluster Pct)</label>
+                                <input type="number" step="0.001" name="sr_cluster_pct" value="0.005" class="form-control">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 动态风控与止损 -->
+                    <div class="card config-card">
+                        <div class="card-header">
+                            <i class="fa-solid fa-shield-halved"></i>
+                            <h3>动态风控体系</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="form-row">
+                                <div class="form-group half">
+                                    <label>ADX 震荡过滤阈值</label>
+                                    <input type="number" name="adx_min" value="18" class="form-control">
+                                </div>
+                                <div class="form-group half">
+                                    <label>每日最大亏损限制</label>
+                                    <input type="number" step="0.01" name="daily_loss_limit_pct" value="0.03" class="form-control">
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group half">
+                                    <label>连续止损熔断(次)</label>
+                                    <input type="number" name="consec_loss_max" value="5" class="form-control">
+                                </div>
+                                <div class="form-group half">
+                                    <label>熔断暂停(天)</label>
+                                    <input type="number" name="consec_loss_pause_days" value="1" class="form-control">
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group half">
+                                    <label>保本触发(1.5R)</label>
+                                    <input type="number" step="0.1" name="trail_be_trigger" value="1.5" class="form-control">
+                                </div>
+                                <div class="form-group half">
+                                    <label>锁利触发(2.0R)</label>
+                                    <input type="number" step="0.1" name="trail_lock_trigger" value="2.0" class="form-control">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <!-- 容器: 运行日志 -->
+            <div class="tab-pane" id="pane-logs">
+                <div class="card console-card">
+                    <div class="console-header">
+                        <div class="window-controls">
+                            <span></span><span></span><span></span>
+                        </div>
+                        <div class="console-title">eth_backtest_v4.py — bash</div>
+                        <div class="console-status status-idle" id="console-status-indicator">● IDLE</div>
+                    </div>
+                    <div class="console-body" id="console-output">
+                        <div class="log-line sys-msg">Welcome to Nexus Quant Engine v4.0.</div>
+                        <div class="log-line sys-msg">System ready. Waiting for configuration...</div>
+                    </div>
+                    <div class="console-progress-container" id="progress-container">
+                        <div class="progress-info">
+                            <span id="progress-text">进度: 0.0%</span>
+                            <span id="progress-stats">资金: 10,000 U | 交易: 0笔 | 回撤: 0%</span>
+                        </div>
+                        <div class="progress-bar-bg">
+                            <div class="progress-bar-fill" id="progress-fill"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 容器: 回测报告 -->
+            <div class="tab-pane" id="pane-results">
+                <!-- 统计卡片 -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-title">总收益率 (ROI)</div>
+                        <div class="stat-value positive" id="res-roi">+0.00%</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-title">期末净值</div>
+                        <div class="stat-value" id="res-final-cap">10,000.00 U</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-title">胜率</div>
+                        <div class="stat-value" id="res-win-rate">0.0%</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-title">最大回撤</div>
+                        <div class="stat-value negative" id="res-mdd">0.0%</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-title">夏普比率</div>
+                        <div class="stat-value" id="res-sharpe">0.00</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-title">总交易笔数</div>
+                        <div class="stat-value" id="res-trades">0</div>
+                    </div>
+                </div>
+
+                <!-- 图表区域 -->
+                <div class="charts-grid">
+                    <div class="card chart-card full-width">
+                        <div class="card-header">
+                            <h3>权益曲线 (Equity Curve)</h3>
+                        </div>
+                        <div class="card-body">
+                            <div id="chart-equity" class="echarts-container"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="card chart-card">
+                        <div class="card-header">
+                            <h3>月度盈亏分布</h3>
+                        </div>
+                        <div class="card-body">
+                            <div id="chart-monthly" class="echarts-container"></div>
+                        </div>
+                    </div>
+
+                    <div class="card chart-card">
+                        <div class="card-header">
+                            <h3>盈亏比分析</h3>
+                        </div>
+                        <div class="card-body">
+                            <div id="chart-pnl" class="echarts-container"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 容器: API与账户 -->
+            <div class="tab-pane" id="pane-account">
+                <div class="config-grid">
+                    <!-- API 设置 -->
+                    <div class="card config-card">
+                        <div class="card-header">
+                            <i class="fa-solid fa-key"></i>
+                            <h3>API 密钥配置</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="form-group">
+                                <label>Binance API Key</label>
+                                <input type="password" name="api_key" value="SUaC72q0dNwHQMsxsNy1kHYhiJsHVj6abxnQjqT65f17RrW4nPPQBJEl5E5jIvli" class="form-control">
+                            </div>
+                            <div class="form-group">
+                                <label>Binance Secret Key</label>
+                                <input type="password" name="secret_key" value="MwOsFq6mwGOkY3021SQQtDKjAgH2uMhzCMXA9STww9J59OHCHgA9AAMb70Gnw2V2" class="form-control">
+                            </div>
+                            <button class="btn btn-primary" id="btn-fetch-account" style="width: 100%; justify-content: center; margin-top: 10px;">
+                                <i class="fa-solid fa-rotate"></i> 获取账户快照
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- 账户概览 -->
+                    <div class="card config-card" style="grid-column: span 2;">
+                        <div class="card-header">
+                            <i class="fa-solid fa-building-columns"></i>
+                            <h3>统一账户概览 (Portfolio Margin)</h3>
+                        </div>
+                        <div class="card-body" id="account-overview" style="height: 100%; display: flex; align-items: center; justify-content: center;">
+                            <div style="color: var(--text-muted); text-align: center; padding: 20px;">
+                                点击左侧"获取账户快照"加载实际数据...
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 持仓列表 -->
+                <div class="card chart-card" style="margin-top: 24px;">
+                    <div class="card-header">
+                        <i class="fa-solid fa-list-check"></i>
+                        <h3>当前活动持仓 (USDT-M)</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-container" id="positions-table-container">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>交易对</th>
+                                        <th>方向</th>
+                                        <th>杠杆</th>
+                                        <th>持仓数量</th>
+                                        <th>开仓价格</th>
+                                        <th>标记价格</th>
+                                        <th>未实现盈亏</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="positions-tbody">
+                                    <tr><td colspan="7" style="text-align: center; color: var(--text-muted); padding: 30px 0;">暂无数据</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 容器: 实盘交易引擎 -->
+            <div class="tab-pane" id="pane-live">
+                <div class="live-dashboard" style="display: grid; grid-template-columns: 350px 1fr; gap: 24px;">
+                    <!-- 左侧：控制台与信号雷达 -->
+                    <div class="live-left" style="display: flex; flex-direction: column; gap: 24px;">
+                        <!-- 主控面板 -->
+                        <div class="card config-card">
+                            <div class="card-header">
+                                <i class="fa-solid fa-power-off"></i>
+                                <h3>Bot 主控台</h3>
+                            </div>
+                            <div class="card-body">
+                                <div class="bot-status-container" style="display: flex; align-items: center; gap: 12px; background: rgba(0,0,0,0.2); padding: 12px; border-radius: var(--radius-sm); border: 1px solid var(--border-color);">
+                                    <div class="status-dot" id="live-bot-dot" style="width: 12px; height: 12px; border-radius: 50%; background: var(--text-muted);"></div>
+                                    <div class="status-text" id="live-bot-status" style="font-weight: 600; color: var(--text-muted); font-size: 14px;">系统离线 - 待启动</div>
+                                </div>
+                                <div class="form-group" style="margin-top: 16px;">
+                                    <label>交易对监听</label>
+                                    <select class="form-control" id="live-symbol">
+                                        <option value="ETHUSDC">ETHUSDC (U本位永续)</option>
+                                        <option value="BTCUSDC">BTCUSDC (U本位永续)</option>
+                                    </select>
+                                </div>
+                                <button class="btn btn-primary" id="btn-toggle-bot" style="width: 100%; justify-content: center; margin-top: 20px;">
+                                    <i class="fa-solid fa-play"></i> 启动实盘机器人
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- 信号监控雷达 -->
+                        <div class="card config-card">
+                            <div class="card-header">
+                                <i class="fa-solid fa-satellite-dish"></i>
+                                <h3>实时信号雷达</h3>
+                            </div>
+                            <div class="card-body" style="padding: 16px;">
+                                <div class="signal-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                                    <div class="signal-item" style="background: rgba(0,0,0,0.2); padding: 10px; border-radius: 6px; text-align: center; border: 1px solid var(--border-color);">
+                                        <div class="sig-label" style="font-size: 11px; color: var(--text-muted); margin-bottom: 4px;">日线趋势</div>
+                                        <div class="sig-value" id="sig-daily" style="font-weight: bold;">--</div>
+                                    </div>
+                                    <div class="signal-item" style="background: rgba(0,0,0,0.2); padding: 10px; border-radius: 6px; text-align: center; border: 1px solid var(--border-color);">
+                                        <div class="sig-label" style="font-size: 11px; color: var(--text-muted); margin-bottom: 4px;">4H 支阻位</div>
+                                        <div class="sig-value" id="sig-4h" style="font-weight: bold;">--</div>
+                                    </div>
+                                    <div class="signal-item" style="background: rgba(0,0,0,0.2); padding: 10px; border-radius: 6px; text-align: center; border: 1px solid var(--border-color);">
+                                        <div class="sig-label" style="font-size: 11px; color: var(--text-muted); margin-bottom: 4px;">入场测距</div>
+                                        <div class="sig-value" id="sig-dist" style="font-weight: bold;">--</div>
+                                    </div>
+                                    <div class="signal-item" style="background: rgba(0,0,0,0.2); padding: 10px; border-radius: 6px; text-align: center; border: 1px solid var(--border-color);">
+                                        <div class="sig-label" style="font-size: 11px; color: var(--text-muted); margin-bottom: 4px;">1H ADX</div>
+                                        <div class="sig-value" id="sig-adx" style="font-weight: bold;">--</div>
+                                    </div>
+                                </div>
+                                <div class="signal-log" id="signal-log-container" style="margin-top: 16px; background: #0d1117; padding: 12px; border-radius: 6px; font-family: var(--font-mono); font-size: 12px; height: 120px; overflow-y: auto; border: 1px solid #30363d;">
+                                    <div style="color: var(--text-muted); text-align: center; margin-top: 40px;">等待机器人启动...</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- 紧急接管 / 手动交易 -->
+                        <div class="card config-card" style="border-color: rgba(255, 51, 102, 0.3);">
+                            <div class="card-header" style="color: var(--danger);">
+                                <i class="fa-solid fa-triangle-exclamation"></i>
+                                <h3>紧急接管与手动交易</h3>
+                            </div>
+                            <div class="card-body">
+                                <div class="form-row">
+                                    <div class="form-group half">
+                                        <label>当前杠杆</label>
+                                        <input type="number" id="manual-leverage" value="3" class="form-control">
+                                    </div>
+                                    <div class="form-group half" style="display: flex; align-items: flex-end;">
+                                        <button class="btn btn-secondary" style="width: 100%; justify-content: center;">设置杠杆</button>
+                                    </div>
+                                </div>
+                                <div class="form-row" style="margin-top: 16px;">
+                                    <button id="btn-manual-long" class="btn" style="flex: 1; background: var(--primary); color: #000; border:none; border-radius: 4px; font-weight: bold; cursor: pointer; justify-content: center;">市价开多</button>
+                                    <button id="btn-manual-short" class="btn" style="flex: 1; background: var(--danger); color: #fff; border:none; border-radius: 4px; font-weight: bold; cursor: pointer; justify-content: center;">市价开空</button>
+                                </div>
+                                <button id="btn-manual-panic" class="btn" style="width: 100%; margin-top: 16px; background: transparent; border: 1px solid var(--danger); color: var(--danger); border-radius: 4px; font-weight: bold; cursor: pointer; justify-content: center;">
+                                    <i class="fa-solid fa-skull"></i> 撤单并市价平仓
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 右侧：执行日志 -->
+                    <div class="live-right">
+                        <div class="card chart-card" style="height: 100%; display: flex; flex-direction: column;">
+                            <div class="card-header">
+                                <i class="fa-solid fa-bolt"></i>
+                                <h3>订单执行日志 (Order Executions)</h3>
+                            </div>
+                            <div class="card-body" style="flex: 1; overflow: hidden; padding: 0;">
+                                <div class="table-container" style="height: 100%; max-height: calc(100vh - 200px);">
+                                    <table class="data-table">
+                                        <thead>
+                                            <tr>
+                                                <th>时间</th>
+                                                <th>动作</th>
+                                                <th>类型</th>
+                                                <th>数量</th>
+                                                <th>价格</th>
+                                                <th>状态</th>
+                                                <th>OrderID</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="live-execution-tbody">
+                                            <tr><td colspan="7" style="text-align: center; color: var(--text-muted); padding: 30px 0;">暂无订单执行记录</td></tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- 脚本文档 -->
+    <script src="app.js"></script>
+</body>
+</html>
